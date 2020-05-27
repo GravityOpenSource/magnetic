@@ -1,0 +1,8 @@
+var data = stream
+    |from()
+        .measurement('fastq_watch')
+
+var trigger = data
+    |alert()
+        .crit(lambda: 1 < 10)
+        .exec('python3', '/opt/scripts/demux_map.py')

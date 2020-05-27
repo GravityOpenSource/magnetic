@@ -24,6 +24,7 @@ services:
     container_name: telegraf-server
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/scripts:/opt/scripts:ro
       - ../data:/data
       - /proc:/host/proc:ro
     environment:
@@ -36,6 +37,7 @@ services:
     volumes:
       - ./kapacitor/data:/var/lib/kapacitor
       - ./kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+      - ./kapacitor/scripts:/opt/scripts:ro
       - ../data:/data
     ports:
       - 9092:9092
@@ -46,4 +48,13 @@ services:
     container_name: redis-server
     volumes:
       - ./redis/data:/data
+    restart: always
+  chronograf-server:
+    image: chronograf:latest
+    container_name: chronograf-server
+    volumes:
+      - ./chronograf/data:/var/lib/chronograf
+    ports:
+      - 9301:8888
+    command: --influxdb-url http://influxdb-server:8086
     restart: always

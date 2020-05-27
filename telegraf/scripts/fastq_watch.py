@@ -7,32 +7,28 @@ import os
 
 
 class FastqEventHandler(FileSystemEventHandler):
-    def on_created(self, event: FileSystemEvent):
+    def on_moved(self, event):
         if event.is_directory:
             return
-        elif event.src_path.endswith('.fastq'):
-            self.insert(event)
+        elif event.dest_path.endswith('.fastq'):
+            self.insert(event.dest_path)
 
-    def on_moved(self, event):
-        command.logger.info('hello moved')
-
-    def get_cell_name(self, src_path):
+    def get_cell_name(self, path):
         root = command.args.path.rstrip('/') + '/'
-        cell_name = src_path.lstrip(root).split('/')[0]
+        cell_name = path.lstrip(root).split('/')[0]
         return cell_name
 
-    def insert(self, event):
+    def insert(self, path):
         cli = command.influxdb_cli()
-        src_path = event.src_path
         data = {
-            'measurement': 'p48_fastq',
+            'measurement': 'fastq_watch',
             'tags': {
-                'cell': self.get_cell_name(src_path),
-                'dir': os.path.dirname(src_path)
+                'cell': self.get_cell_name(path),
+                'dir': os.path.dirname(path)
             },
             'fields': {
-                'size': os.path.getsize(src_path),
-                'path': src_path
+                'size': os.path.getsize(path),
+                'path': path
             }
         }
         cli.write_points([data])
