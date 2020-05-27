@@ -1,0 +1,49 @@
+version: '3'
+services:
+  influxdb-server:
+    image: influxdb:1.8
+    container_name: influxdb-server
+    volumes:
+      - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - ./influxdb/data:/var/lib/influxdb
+    command: -config /etc/influxdb/influxdb.conf
+    restart: always
+  grafana-server:
+    image: grafana/grafana:7.0.1-ubuntu
+    container_name: grafana-server
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    ports:
+      - 9300:3000
+    environment:
+      - GF_INSTALL_PLUGINS=paytm-kapacitor-datasource,grafana-clock-panel
+    restart: always
+  telegraf-server:
+    build:
+      context: telegraf
+    container_name: telegraf-server
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ../data:/data
+      - /proc:/host/proc:ro
+    environment:
+      - HOST_PROC=/host/proc
+    restart: always
+  kapacitor-server:
+    build:
+      context: kapacitor
+    container_name: kapacitor-server
+    volumes:
+      - ./kapacitor/data:/var/lib/kapacitor
+      - ./kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+      - ../data:/data
+    ports:
+      - 9092:9092
+    env_file:
+      - ./kapacitor/kapacitor.env
+  redis-server:
+    image: redis:latest
+    container_name: redis-server
+    volumes:
+      - ./redis/data:/data
+    restart: always
