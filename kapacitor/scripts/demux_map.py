@@ -23,4 +23,5 @@ if __name__ == '__main__':
                         'filename_stem=%s' % filename,
                         'references_file=/data/ncov2019/references.fasta'
                     ]
-                    os.system(' '.join(command))
+                    if not os.system(' '.join(command)) == 0:
+                        sys.exit(1)
