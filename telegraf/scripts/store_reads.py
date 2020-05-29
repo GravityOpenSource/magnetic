@@ -42,7 +42,6 @@ class StoreReadsCommand(BaseCommand):
             for i in range(r_start, r_end):
                 for ii in range(0, read_len):
                     key = '%s_%s_%s' % (i, barcode, ii)
-                    print(key)
                     rc.hincrby('CELL:%s' % cell_name, key)
 
 
