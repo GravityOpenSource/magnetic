@@ -49,7 +49,3 @@ class StoreReadsCommand(BaseCommand):
 if __name__ == '__main__':
     command = StoreReadsCommand()
     command.run()
-
-
-f=open('a')
-f.write()
