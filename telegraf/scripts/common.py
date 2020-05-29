@@ -61,5 +61,5 @@ class BaseCommand:
         return client
 
     def influxdb_cli(self):
-        client = InfluxDBClient(host=self.args.influxdb_host, port=8086, database='telegraf')
+        client = InfluxDBClient(host=self.args.influxdb_host, port=8086, database='telegraf', gzip=True)
         return client
