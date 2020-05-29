@@ -3,8 +3,8 @@ import argparse
 import redis
 from influxdb import InfluxDBClient
 
-STEP = 300
-R_STEP = 500
+POSITION_STEP = 300  # 位点区间长度
+LENGTH_STEP = 500  # reads长度区间长度
 
 
 class BaseCommand:
