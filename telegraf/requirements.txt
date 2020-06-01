@@ -2,3 +2,6 @@ redis
 influxdb
 daemons
 watchdog
+protobuf
+grpcio
+grpcio-tools
