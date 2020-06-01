@@ -27,8 +27,8 @@ services:
       - ./telegraf/scripts:/opt/scripts:ro
       - ../data:/data
       - /proc:/host/proc:ro
-    environment:
-      - HOST_PROC=/host/proc
+    env_file:
+      - ./telegraf/telegraf.env
     restart: always
   kapacitor-server:
     build:

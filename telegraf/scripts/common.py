@@ -34,7 +34,11 @@ class BaseCommand:
         parser = self.parser()
         self.args = parser.parse_args()
         self.logger = self._init_logger()
-        self.handle(self.args)
+        try:
+            self.handle(self.args)
+        except Exception as e:
+            self.logger.error(e)
+            raise e
 
     def handle(self, args):
         """
