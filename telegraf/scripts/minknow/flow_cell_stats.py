@@ -31,12 +31,15 @@ class FlowCellStatsCommand(BaseCommand):
                 stub = device_pb2_grpc.DeviceServiceStub(channel)
                 device_request = device_pb2.GetFlowCellInfoRequest()
                 flow_cell_info = stub.get_flow_cell_info(device_request)
-                if flow_cell_info.has_flow_cell:
-                    print('flow_cell_info,machine=P1,device=%s,product_code=%s flow_cell_id="%s"' % (
-                        device.name,
-                        flow_cell_info.product_code,
-                        flow_cell_info.flow_cell_id,
-                    ))
+                print('flow_cell_info,machine=P1,device=%s status=%s,product_code="%s",flow_cell_id="%s",x=%s,y=%s' % (
+                    device.name,
+                    2 if flow_cell_info.has_flow_cell else 1,
+                    flow_cell_info.product_code,
+                    flow_cell_info.flow_cell_id,
+                    device.layout.x,
+                    device.layout.y
+                ))
+
 
     def get_devices(self, host):
         manager_stub = self.manager_stub(host)
