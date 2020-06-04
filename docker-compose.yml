@@ -9,14 +9,15 @@ services:
     command: -config /etc/influxdb/influxdb.conf
     restart: always
   grafana-server:
-    image: grafana/grafana:7.0.1-ubuntu
+    image: grafana/grafana:7.0.3-ubuntu
     container_name: grafana-server
     volumes:
       - ./grafana/data:/var/lib/grafana
     ports:
       - 9300:3000
-    environment:
-      - GF_INSTALL_PLUGINS=paytm-kapacitor-datasource,grafana-clock-panel
+    env_file:
+      - ./grafana/grafana.env
+    user: '104'
     restart: always
   telegraf-server:
     build:
