@@ -60,13 +60,8 @@ class BaseCommand:
         parser.add_argument('-i', '--influxdb-host', default='influxdb-server', help='influxdb server host')
         parser.add_argument('-iu', '--influxdb-username', default='', help='influxdb server username')
         parser.add_argument('-ip', '--influxdb-password', default='', help='influxdb server password')
-        parser.add_argument('-l', '--log-file', default=self._default_log(), help='log file path')
+        parser.add_argument('-l', '--log-file', default='/var/log/tigk.log', help='log file path')
         return parser
-
-    def _default_log(self):
-        if platform.system() == "Windows":
-            return r'C:\tigk.log'
-        return '/var/log/tigk.log'
 
     def redis_cli(self):
         client = redis.Redis(host=self.args.redis_host, port=6379, db=1, decode_responses=True)

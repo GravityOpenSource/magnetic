@@ -6,3 +6,4 @@ watchdog
 protobuf
 grpcio
 grpcio-tools
+xmltodict
