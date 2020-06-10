@@ -10,6 +10,7 @@ import xmltodict
 import win32serviceutil
 import win32event
 import win32service
+import logging
 
 
 class WindowsSvc(win32serviceutil.ServiceFramework):
@@ -26,10 +27,11 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         self.run = True
+        self.logger = logging.getLogger(__name__)
+        logging.basicConfig(level=logging.INFO, filename=self.options.get('log_file'), filemode='a')
 
     def SvcDoRun(self):
-        f = open(r'C:\tigk.log', 'a')
-        event_handler = FastqEventHandler(self.options)
+        event_handler = FastqEventHandler(self)
         observer = Observer()
         observer.schedule(event_handler, self.options.get('path'), recursive=True)
         observer.start()
@@ -37,7 +39,7 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
             while self.run and observer.is_alive():
                 observer.join(1)
         except Exception as e:
-            f.write(str(e) + '\n')
+            self.logger.error(str(e))
         observer.stop()
         observer.join()
 
@@ -48,26 +50,19 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
 
 
 class FastqEventHandler(FileSystemEventHandler):
-    def __init__(self, options=None):
+    def __init__(self, svc: WindowsSvc):
         self.influxdb_cli = InfluxDBClient(
-            host=options.get('influxdb_host'),
+            host=svc.options.get('influxdb_host'),
             port=8086,
-            username=options.get('influxdb_username'),
-            password=options.get('influxdb_password'),
+            username=svc.options.get('influxdb_username'),
+            password=svc.options.get('influxdb_password'),
             database='telegraf',
             gzip=True
         )
+        self.logger = svc.logger
 
     def on_any_event(self, event):
-        f = open(r'C:\tigk.log', 'a')
-        f.write(event.event_type + ':' + event.src_path + '\n')
-        f.close()
-
-    # def on_modified(self, event):
-    #     # if event.is_directory:
-    #         return
-    #     self.insert(event.src_path)
-    #     self.analysis(event.src_path)
+        self.logger.info(event.event_type + ':' + event.src_path)
 
     def on_created(self, event):
         if event.is_directory:
@@ -76,15 +71,19 @@ class FastqEventHandler(FileSystemEventHandler):
             self.insert(event.src_path)
             self.analysis(event.src_path)
         except Exception as e:
-            f = open(r'C:\tigk.log', 'a')
-            f.write(str(e) + '\n')
-            f.close()
+            self.logger.error(str(e))
 
     # def on_moved(self, event):
     #     if event.is_directory:
     #         return
     #     self.insert(event.dest_path)
     #     self.analysis(event.dest_path)
+
+    # def on_modified(self, event):
+    #     # if event.is_directory:
+    #         return
+    #     self.insert(event.src_path)
+    #     self.analysis(event.src_path)
 
     def insert(self, path):
         cli = self.influxdb_cli
@@ -101,9 +100,7 @@ class FastqEventHandler(FileSystemEventHandler):
         try:
             cli.write_points([data])
         except Exception as e:
-            f = open(r'C:\tigk.log', 'a')
-            f.write(str(e) + '\n')
-            f.close()
+            self.logger.error(str(e))
 
     def analysis(self, path):
         root = os.path.dirname(path)
@@ -151,7 +148,7 @@ class FastqEventHandler(FileSystemEventHandler):
         try:
             cli.write_points(lamp_data)
         except Exception as e:
-            print(e)
+            self.logger.error(str(e))
 
     def valid_input(self, input):
         try:
@@ -170,23 +167,16 @@ class WatchCommand(object):
     def parser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('action', choices=['install', 'start', 'stop', 'restart', 'remove'])
-        parser.add_argument('-r', '--redis-host', default='redis-server', help='redis server host')
         parser.add_argument('-i', '--influxdb-host', default='influxdb-server', help='influxdb server host')
         parser.add_argument('-iu', '--influxdb-username', default='', help='influxdb server username')
         parser.add_argument('-ip', '--influxdb-password', default='', help='influxdb server password')
-        parser.add_argument('-l', '--log-file', default='C:\\tigk.log', help='log file path')
+        parser.add_argument('-l', '--log-file', default='C:/ProgramData/Telegraf/watch.log', help='log file path')
         parser.add_argument('-p', '--path', default='pcr', help='observer path')
         return parser
 
     def run(self):
         parser = self.parser()
-        self.args = parser.parse_args()
-        try:
-            self.handle(self.args)
-        except Exception as e:
-            raise e
-
-    def handle(self, args):
+        args = parser.parse_args()
         args.log_file = os.path.abspath(args.log_file)
         args.path = os.path.abspath(args.path)
         win32serviceutil.HandleCommandLine(WindowsSvc)
