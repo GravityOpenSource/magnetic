@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
-
 import os
 from influxdb import InfluxDBClient
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import argparse
+import datetime
+import time
+import xmltodict
 
 import win32serviceutil
 import win32event
@@ -33,7 +34,7 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
         observer.schedule(event_handler, self.options.get('path'), recursive=True)
         observer.start()
         try:
-            while self.run:
+            while self.run and observer.is_alive():
                 observer.join(1)
         except Exception as e:
             f.write(str(e) + '\n')
@@ -57,21 +58,36 @@ class FastqEventHandler(FileSystemEventHandler):
             gzip=True
         )
 
-    def on_created(self, event):
+    def on_any_event(self, event):
         f = open(r'C:\tigk.log', 'a')
-        f.write(event.src_path + '\n')
-        if event.is_directory:
-            return
-        self.insert(event.src_path)
+        f.write(event.event_type + ':' + event.src_path + '\n')
+        f.close()
 
-    def on_moved(self, event):
+    # def on_modified(self, event):
+    #     # if event.is_directory:
+    #         return
+    #     self.insert(event.src_path)
+    #     self.analysis(event.src_path)
+
+    def on_created(self, event):
         if event.is_directory:
             return
-        self.insert(event.dest_path)
+        try:
+            self.insert(event.src_path)
+            self.analysis(event.src_path)
+        except Exception as e:
+            f = open(r'C:\tigk.log', 'a')
+            f.write(str(e) + '\n')
+            f.close()
+
+    # def on_moved(self, event):
+    #     if event.is_directory:
+    #         return
+    #     self.insert(event.dest_path)
+    #     self.analysis(event.dest_path)
 
     def insert(self, path):
         cli = self.influxdb_cli
-        f = open(r'C:\tigk.log', 'a')
         data = {
             'measurement': 'pcr_watch',
             'tags': {
@@ -85,18 +101,80 @@ class FastqEventHandler(FileSystemEventHandler):
         try:
             cli.write_points([data])
         except Exception as e:
+            f = open(r'C:\tigk.log', 'a')
             f.write(str(e) + '\n')
+            f.close()
+
+    def analysis(self, path):
+        root = os.path.dirname(path)
+        exts = ['lamp', 'mcd', 'csv', 'xml']
+        filename = os.path.splitext(os.path.basename(path))[0]
+        for ext in exts:
+            f = '%s.%s' % (filename, ext)
+            if not os.path.exists(os.path.join(root, f)):
+                return
+        xml_file = open(os.path.join(root, '%s.xml' % filename), encoding='utf-8')
+        xml_dict = xmltodict.parse(xml_file.read())
+        hole_info = xml_dict['Report']['SubReport']['GroupInfoNo']['HoleInfo']
+        hole_display = {}
+        for hole in hole_info:
+            hole_display[hole['ChipHoleNo']] = hole['HoleName']
+        lamp_file = open(os.path.join(root, '%s.lamp' % filename))
+        lamp_data = []
+        cli = self.influxdb_cli
+        time = 1
+        lamp_content = lamp_file.readlines()
+        start_time = datetime.datetime.strptime(lamp_content[1].split('\t')[3], '%Y-%m-%d %X')
+        utc_time = self.local2utc(start_time)
+        for line in lamp_content[::-1]:
+            if line:
+                line_list = line.strip().split('\t')
+                if not self.valid_input(line_list[0]):
+                    break
+                for i in range(len(line_list)):
+                    data = {
+                        'measurement': 'pcr_data',
+                        'time': utc_time - datetime.timedelta(seconds=time * 30),
+                        'tags': {
+                            'sn': xml_dict['Report']['SubReport']['GroupInfoNo']['GroupInfo']['TestNo'],
+                            'channel': 'channel-%s' % i,
+                            'channel_display': hole_display.get(str(i + 1))
+                        },
+                        'fields': {
+                            'second': time * 30,
+                            'name': 'name-%s' % i,
+                            'value': line_list[i]
+                        }
+                    }
+                    lamp_data.append(data)
+                time += 1
+        try:
+            cli.write_points(lamp_data)
+        except Exception as e:
+            print(e)
+
+    def valid_input(self, input):
+        try:
+            float(input)
+            return True
+        except ValueError:
+            return False
+
+    def local2utc(self, local_st):
+        time_struct = time.mktime(local_st.timetuple())
+        utc_st = datetime.datetime.utcfromtimestamp(time_struct)
+        return utc_st
 
 
 class WatchCommand(object):
     def parser(self):
         parser = argparse.ArgumentParser()
+        parser.add_argument('action', choices=['install', 'start', 'stop', 'restart', 'remove'])
         parser.add_argument('-r', '--redis-host', default='redis-server', help='redis server host')
         parser.add_argument('-i', '--influxdb-host', default='influxdb-server', help='influxdb server host')
         parser.add_argument('-iu', '--influxdb-username', default='', help='influxdb server username')
         parser.add_argument('-ip', '--influxdb-password', default='', help='influxdb server password')
         parser.add_argument('-l', '--log-file', default='C:\\tigk.log', help='log file path')
-        parser.add_argument('action', choices=['install', 'start', 'stop', 'restart', 'remove'])
         parser.add_argument('-p', '--path', default='pcr', help='observer path')
         return parser
 
