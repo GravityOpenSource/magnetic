@@ -6,6 +6,7 @@ import argparse
 import datetime
 import time
 import xmltodict
+import zipfile
 
 import win32serviceutil
 import win32event
@@ -28,12 +29,15 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
         self.run = True
         self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO, filename=self.options.get('log_file'), filemode='a')
+        fh = logging.FileHandler(filename=self.options.get('log_file'), mode='a', encoding='utf-8')
+        logging.basicConfig(handlers=[fh], level=logging.INFO)
 
     def SvcDoRun(self):
-        event_handler = FastqEventHandler(self)
+        pcr_event_handler = PCREventHandler(self)
+        rdml_event_handler = RDMLEventHandler(self)
         observer = Observer()
-        observer.schedule(event_handler, self.options.get('path'), recursive=True)
+        observer.schedule(pcr_event_handler, self.options.get('path'), recursive=True)
+        observer.schedule(rdml_event_handler, self.options.get('rdml_path'), recursive=True)
         observer.start()
         try:
             while self.run and observer.is_alive():
@@ -49,7 +53,7 @@ class WindowsSvc(win32serviceutil.ServiceFramework):
         self.run = False
 
 
-class FastqEventHandler(FileSystemEventHandler):
+class PCREventHandler(FileSystemEventHandler):
     def __init__(self, svc: WindowsSvc):
         self.influxdb_cli = InfluxDBClient(
             host=svc.options.get('influxdb_host'),
@@ -62,7 +66,7 @@ class FastqEventHandler(FileSystemEventHandler):
         self.logger = svc.logger
 
     def on_any_event(self, event):
-        self.logger.info(event.event_type + ':' + event.src_path)
+        self.logger.info('PCR-' + event.event_type + ':' + event.src_path)
 
     def on_created(self, event):
         if event.is_directory:
@@ -163,6 +167,70 @@ class FastqEventHandler(FileSystemEventHandler):
         return utc_st
 
 
+class RDMLEventHandler(FileSystemEventHandler):
+    def __init__(self, svc: WindowsSvc):
+        self.influxdb_cli = InfluxDBClient(
+            host=svc.options.get('influxdb_host'),
+            port=8086,
+            username=svc.options.get('influxdb_username'),
+            password=svc.options.get('influxdb_password'),
+            database='telegraf',
+            gzip=True
+        )
+        self.logger = svc.logger
+
+    def on_any_event(self, event):
+        self.logger.info('RDML-' + event.event_type + ':' + event.src_path)
+
+    def on_created(self, event):
+        if event.is_directory or not event.src_path.endswith('rdml'):
+            return
+        try:
+            self.analysis(event.src_path)
+        except Exception as e:
+            self.logger.error(str(e))
+
+    def analysis(self, path):
+        z = zipfile.ZipFile(path, 'r')
+        for f in z.namelist():
+            xml_file = z.read(f)
+            xml_dict = xmltodict.parse(xml_file)
+            for item in xml_dict['rdml']['experiment']['run']['react']:
+                adp_data = []
+                mdp_data = []
+                for adp in item['data']['adp']:
+                    data = {
+                        'measurement': 'pcr_rdml_adp',
+                        'tags': {
+                            'sample': item['sample']['@id'],
+                            'tar': item['data']['tar']['@id'],
+                            'cyc': adp['cyc'],
+                        },
+                        'fields': {
+                            'fluor': adp['fluor']
+                        }
+                    }
+                    adp_data.append(data)
+                for mdp in item['data']['mdp']:
+                    data = {
+                        'measurement': 'pcr_rdml_mdp',
+                        'tags': {
+                            'sample': item['sample']['@id'],
+                            'tar': item['data']['tar']['@id'],
+                            'tmp': mdp['tmp'],
+                        },
+                        'fields': {
+                            'fluor': mdp['fluor']
+                        }
+                    }
+                    mdp_data.append(data)
+                try:
+                    self.influxdb_cli.write_points(adp_data)
+                    self.influxdb_cli.write_points(mdp_data)
+                except Exception as e:
+                    self.logger.error(str(e))
+
+
 class WatchCommand(object):
     def parser(self):
         parser = argparse.ArgumentParser()
@@ -171,7 +239,8 @@ class WatchCommand(object):
         parser.add_argument('-iu', '--influxdb-username', default='', help='influxdb server username')
         parser.add_argument('-ip', '--influxdb-password', default='', help='influxdb server password')
         parser.add_argument('-l', '--log-file', default='C:/ProgramData/Telegraf/watch.log', help='log file path')
-        parser.add_argument('-p', '--path', default='pcr', help='observer path')
+        parser.add_argument('-p', '--path', default='pcr', help='pcr observer path')
+        parser.add_argument('-rp', '--rdml-path', default='rdml', help='rdml observer path')
         return parser
 
     def run(self):
