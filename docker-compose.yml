@@ -6,6 +6,8 @@ services:
     volumes:
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - ./influxdb/data:/var/lib/influxdb
+    ports:
+      - 8086:8086
     command: -config /etc/influxdb/influxdb.conf
     restart: always
   grafana-server:
@@ -23,13 +25,16 @@ services:
     build:
       context: telegraf
     container_name: telegraf-server
+
     volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.d:/etc/telegraf/telegraf.d:ro
       - ./telegraf/scripts:/opt/scripts:ro
       - ../data:/data
       - /proc:/host/proc:ro
     env_file:
-      - ./telegraf/telegraf.env
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.env
+    command: --config-directory /etc/telegraf/telegraf.d
     restart: always
   kapacitor-server:
     build:

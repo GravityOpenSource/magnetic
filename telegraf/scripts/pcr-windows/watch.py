@@ -195,9 +195,21 @@ class RDMLEventHandler(FileSystemEventHandler):
         for f in z.namelist():
             xml_file = z.read(f)
             xml_dict = xmltodict.parse(xml_file)
+            cq_data = []
             for item in xml_dict['rdml']['experiment']['run']['react']:
                 adp_data = []
                 mdp_data = []
+                cq_data.append({
+                    'measurement': 'pcr_rdml_cq',
+                    'tags': {
+                        'sample': item['sample']['@id'],
+                        'tar': item['data']['tar']['@id'],
+                        'id': item['@id']
+                    },
+                    'fields': {
+                        'value': item['data']['cq']
+                    }
+                })
                 for adp in item['data']['adp']:
                     data = {
                         'measurement': 'pcr_rdml_adp',
@@ -229,6 +241,10 @@ class RDMLEventHandler(FileSystemEventHandler):
                     self.influxdb_cli.write_points(mdp_data)
                 except Exception as e:
                     self.logger.error(str(e))
+            try:
+                self.influxdb_cli.write_points(cq_data)
+            except Exception as e:
+                self.logger.error(str(e))
 
 
 class WatchCommand(object):
