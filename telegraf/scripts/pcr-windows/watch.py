@@ -204,7 +204,8 @@ class RDMLEventHandler(FileSystemEventHandler):
                     'tags': {
                         'sample': item['sample']['@id'],
                         'tar': item['data']['tar']['@id'],
-                        'id': item['@id']
+                        'ID': '%03d' % int(item['@id']),
+                        'excl': item['data'].get('excl', 'FALSE')
                     },
                     'fields': {
                         'value': item['data']['cq']
