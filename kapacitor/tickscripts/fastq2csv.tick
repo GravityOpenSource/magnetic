@@ -5,4 +5,4 @@ var data = stream
 var trigger = data
     |alert()
         .crit(lambda: 1 < 10)
-        .exec('python3', '/opt/scripts/demux_map.py')
+        .post('http://celery-server/tasks/demux_map')

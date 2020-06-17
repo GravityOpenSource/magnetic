@@ -43,8 +43,6 @@ services:
     volumes:
       - ./kapacitor/data:/var/lib/kapacitor
       - ./kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
-      - ./kapacitor/scripts:/opt/scripts:ro
-      - ../data:/data
     ports:
       - 9092:9092
     env_file:
@@ -63,4 +61,17 @@ services:
     ports:
       - 9301:8888
     command: --influxdb-url http://influxdb-server:8086
+    restart: always
+  celery-server:
+    build:
+      context: celery
+    container_name: celery-server
+    volumes:
+      - ./celery:/opt/celery:ro
+      - ./celery/data:/opt/celery/data
+      - ./celery/scripts:/opt/scripts:ro
+      - ../data:/data
+    ports:
+      - 9302:80
+      - 9303:8080
     restart: always
