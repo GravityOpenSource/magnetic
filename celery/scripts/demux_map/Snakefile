@@ -1,80 +1,33 @@
+import os
 
 ##### Configuration #####
 
-# trim trailing slashes from paths to avoid snakemake complaining of double '/' in paths
-config["output_path"] = config["output_path"].rstrip("/")
-config["input_path"] = config["input_path"].rstrip("/")
+# gloal options
+input_fastq = config["input_fastq"]
+reference_file = config["reference_file"]
+output_path = config["output_path"].rstrip("/")
+fastq_name = os.path.splitext(os.path.basename(input_fastq))[0]
+temp_output_path = os.path.join(output_path, 'temp')
 
-# todo - check that 'barcode_set' is one of 'native', 'rapid', `pcr`, `none` or 'all' and throw error if not
-barcode_set = " --native_barcodes"
-if str(config["barcode_set"]).lower()=="native":
-    barcode_set= " --native_barcodes"
-elif str(config["barcode_set"]).lower()=="rapid":
-    barcode_set= " --rapid_barcodes"
-elif str(config["barcode_set"]).lower()=="pcr":
-    barcode_set=" --pcr_barcodes"
-elif str(config["barcode_set"]).lower()=="none":
-    barcode_set=" --native_barcodes"
-elif str(config["barcode_set"]).lower()=="all":
-    barcode_set=""
+# guppy options
+guppy_barcoding_threads = config["guppy_barcoding_threads"]
+guppy_barcoding_path = os.path.join(temp_output_path, "guppy_barcoding_%s" % fastq_name)
+guppy_barcoding_summary = os.path.join(temp_output_path, "%s_barcoding_summary.txt" % fastq_name)
 
-# todo - check that the barcode labels fit the required format (text followed by an integer)
-limit_barcodes_to = ""
-if str(config["barcode_set"]).lower()=="none":
-    # limit to an arbitrary barcode (it will be ignored)
-    limit_barcodes_to = " --limit_barcodes_to 1"
-else:
-    try:
-        barcodes = config["limit_barcodes_to"].split(',')
-        barcode_string = ""
-        for i in barcodes:
-            barcode_string+=" {}".format(i.lstrip("NB").lstrip("BC").lstrip("barcode"))
-        limit_barcodes_to = " --limit_barcodes_to {}".format(barcode_string)
-    except:
-        pass
-        # print("No barcodes given, will search for all barcodes within the {} barcode list.".format(config["barcode_set"]))
+# minimap2 option
+minimap2_paf = os.path.join(temp_output_path, "%s_minimap2.paf" % fastq_name)
 
-reference_fields = config["reference_fields"] if config.get("reference_fields") else ""
-
-discard_unassigned = ""
-if str(config["discard_unassigned"]).lower()=="true":
-    discard_unassigned= " --discard_unassigned"
-else:
-    discard_unassigned= ""
-
-# todo - check that the value is true or false
-require_two_barcodes = ""
-if str(config["require_two_barcodes"]).lower()=="false":
-    require_two_barcodes= ""
-else:
-    require_two_barcodes= " --require_two_barcodes"
-
-# todo - check that the value is true or false
-split_reads = ""
-if str(config["split_reads"]).lower()=="true":
-    split_reads= ""
-else:
-    split_reads= " --no_split"
-
-# todo - check that the value is true or false
-discard_middle = ""
-if str(config["discard_middle"]).lower()=="true":
-    discard_middle= " --discard_middle"
-else:
-    discard_middle= ""
-
-minimum_identity = ""
-if config.get("minimum_identity"):
-    minimum_identity= f" --minimum_identity {config['minimum_identity']}"
-else:
-    minimum_identity= ""
+# parse mapping
+minimum_identity = ("--min_identity %s" % config.get("min_identity")) if config.get("min_identity") else ""
+report_csv = os.path.join(output_path, '%s.csv' % fastq_name)
 
 ##### Target rules #####
 
 rule all:
     input:
-        expand(config["output_path"]+ "/{filename_stem}.csv", filename_stem=config["filename_stem"])
+         report_csv
 
 ##### Modules #####
-include: "rules/demultiplex.smk"
-include: "rules/map.smk"
+include: "rules/guppy_barcoder.smk"
+include: "rules/minimap2.smk"
+include: "rules/parse.smk"
