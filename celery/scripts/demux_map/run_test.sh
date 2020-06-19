@@ -1,8 +1,9 @@
 snakemake \
---snakefile Snakefile \
---configfile config.yaml \
+--snakefile /opt/scripts/demux_map/Snakefile \
+--configfile /opt/scripts/demux_map/config.yaml \
+--cores 2 \
 --config \
-input_fastq=/project/zhuying/data/basecalled/20200212-COV0003-P5-PAE36018/fastq_pass/PAE36018_pass_96513dd9_1468.fastq \
-output_path=/data/personal/zhuying/github/tigk/output \
-references_file=/data/ncov2019/references.fasta \
+input_fastq=/data/basecalled/20200313-COV0028-P5-PAE38849-NCP/PAE38849/fastq_pass/PAE38849_pass_c7324bab_1111.fastq \
+output_path=/data/rampart_annotations/20200313-COV0028-P5-PAE38849-NCP-2 \
+reference_file=/data/ncov2019/references.fasta \
 guppy_barcoding_threads=2
