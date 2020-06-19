@@ -8,7 +8,7 @@ def read_barcoding_summary(barcoding_summary_file, reads_dict: dict):
     reader = csv.DictReader(fi, delimiter='\t')
     for row in reader:
         read_id = row['read_id']
-        barcode = row['barcode_full_arrangement'] if row['barcode_arrangement'] == 'unclassified' else 'none'
+        barcode = row['barcode_full_arrangement'] if not row['barcode_arrangement'] == 'unclassified' else 'none'
         reads_dict.setdefault(read_id, ['none', 'none'])[0] = barcode.split('_')[0]
     fi.close()
 
