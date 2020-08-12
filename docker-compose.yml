@@ -6,29 +6,35 @@ services:
     volumes:
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - ./influxdb/data:/var/lib/influxdb
+    ports:
+      - 8086:8086
     command: -config /etc/influxdb/influxdb.conf
     restart: always
   grafana-server:
-    image: grafana/grafana:7.0.1-ubuntu
+    image: grafana/grafana:7.0.3-ubuntu
     container_name: grafana-server
     volumes:
       - ./grafana/data:/var/lib/grafana
     ports:
       - 9300:3000
-    environment:
-      - GF_INSTALL_PLUGINS=paytm-kapacitor-datasource,grafana-clock-panel
+    env_file:
+      - ./grafana/grafana.env
+    user: '104'
     restart: always
   telegraf-server:
     build:
       context: telegraf
     container_name: telegraf-server
+
     volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.d:/etc/telegraf/telegraf.d:ro
       - ./telegraf/scripts:/opt/scripts:ro
       - ../data:/data
       - /proc:/host/proc:ro
-    environment:
-      - HOST_PROC=/host/proc
+    env_file:
+      - ./telegraf/conf/${TELEGRAF_PLATFORM:-minknow}/telegraf.env
+    command: --config-directory /etc/telegraf/telegraf.d
     restart: always
   kapacitor-server:
     build:
@@ -37,8 +43,6 @@ services:
     volumes:
       - ./kapacitor/data:/var/lib/kapacitor
       - ./kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
-      - ./kapacitor/scripts:/opt/scripts:ro
-      - ../data:/data
     ports:
       - 9092:9092
     env_file:
@@ -57,4 +61,17 @@ services:
     ports:
       - 9301:8888
     command: --influxdb-url http://influxdb-server:8086
+    restart: always
+  celery-server:
+    build:
+      context: celery
+    container_name: celery-server
+    volumes:
+      - ./celery:/opt/celery:ro
+      - ./celery/data:/opt/celery/data
+      - ./celery/scripts:/opt/scripts:ro
+      - ../data:/data
+    ports:
+      - 9302:80
+      - 9303:8080
     restart: always

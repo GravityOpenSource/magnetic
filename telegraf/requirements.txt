@@ -1,4 +1,9 @@
 redis
 influxdb
-daemons
+daemons;platform_system=="Linux"
+pywin32;platform_system=="Windows"
 watchdog
+protobuf
+grpcio
+grpcio-tools
+xmltodict

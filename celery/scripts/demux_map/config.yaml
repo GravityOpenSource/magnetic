@@ -1,0 +1,11 @@
+##### Fastq file stem #####
+
+input_fastq: /path/to/fastq/file
+output_path: /path/to/data #where rampart will put the data
+
+##### Mapping reference panel #####
+
+reference_file: references.fasta
+
+##### guppy barcoding options #####
+guppy_barcoding_threads: 2

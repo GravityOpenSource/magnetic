@@ -1,0 +1,498 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 12,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "$tag_channel_display",
+          "groupBy": [
+            {
+              "params": [
+                "channel_display"
+              ],
+              "type": "tag"
+            }
+          ],
+          "measurement": "pcr_data",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"value\" FROM \"pcr_data\" GROUP BY \"channel_display\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "sn",
+              "operator": "=",
+              "value": "123_1_20200601171012"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": " 恒温荧光扩增PCR—算法计算后的曲线",
+      "tooltip": {
+        "shared": false,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "locale",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 169
+              }
+            ]
+          }
+        ]
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "/.*/",
+          "color": "#56A64B"
+        },
+        {
+          "alias": "/.*(TRUE)/",
+          "color": "#E02F44"
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "$tag_sample&$tag_tar($tag_excl)",
+          "groupBy": [
+            {
+              "params": [
+                "sample"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "tar"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "id"
+              ],
+              "type": "tag"
+            }
+          ],
+          "measurement": "pcr_rdml_cq",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"value\" FROM \"pcr_rdml_cq\" GROUP BY \"sample\", \"tar\", \"excl\",  \"ID\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "荧光定量PCR—CQ值",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": false,
+        "values": [
+          "max"
+        ]
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "followTheme": true,
+        "getOption": "let cyc, sample, tar, fluor\ndata.series[0].fields.forEach(val=>{\n  if (val.name === 'cyc') cyc = val.values.buffer;\n  if (val.name === 'sample') sample = val.values.buffer;\n  if (val.name === 'tar') tar = val.values.buffer;\n  if (val.name === 'fluor') fluor = val.values.buffer;\n})\nlet max = Math.max(...cyc)\n\nlet xAxis = Array.from({length: max}, (v, i) => i + 1)\nlet data_length = cyc.length\nlet new_data = {}\nlet group_color = {}\nlet color = echartsInstance.getOption().color\nfor (i=0;i<data_length;i++){\n  let key = sample[i] + '&' + tar[i]\n  if (!Boolean(group_color[sample[i]])) {\n    group_color[sample[i]] = color.shift()\n  }\n  if (!Boolean(new_data[key])) {\n    new_data[key] = {\n      data: new Array(xAxis.length),\n      type: 'line',\n      name: key,\n      smooth: true,\n      showSymbol: false,\n      color: group_color[sample[i]]\n  \t}\n  }\n  new_data[key]['data'][cyc[i] - 1] = fluor[i]\n}\nlet series = []\nfor (let i in new_data){\n  series.push(new_data[i])\n}\nreturn {\n  grid: {\n    right: 200,\n  },\n  legend: {\n    show: true,\n    type: 'scroll',\n    orient: 'vertical',\n    right: 0,\n    selector: true\n  },\n  tooltip: {\n    trigger: 'item',\n    axisPointer: {\n      type: 'cross',\n      label: {\n        backgroundColor: '#6a7985'\n      }\n    },\n    confine: true\n  },\n  xAxis: {\n    type: 'category',\n    data: xAxis\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: series\n};"
+      },
+      "pluginVersion": "7.0.3",
+      "targets": [
+        {
+          "alias": "",
+          "groupBy": [
+            {
+              "params": [
+                "sample"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "tar"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "cyc"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "measurement": "pcr_rdml_adp",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"fluor\" FROM \"pcr_rdml_adp\" GROUP BY \"sample\", \"tar\", \"cyc\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "fluor"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "荧光定量PCR—定量曲线",
+      "type": "bilibala-echarts-panel"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "followTheme": true,
+        "getOption": "console.log(data)\nlet tmp, sample, tar, fluor\ndata.series[0].fields.forEach(val=>{\n  if (val.name === 'tmp') tmp = val.values.buffer;\n  if (val.name === 'sample') sample = val.values.buffer;\n  if (val.name === 'tar') tar = val.values.buffer;\n  if (val.name === 'fluor') fluor = val.values.buffer;\n})\nlet xAxis = Array.from(new Set(tmp))\nconsole.log(xAxis)\nlet data_length = tmp.length\nlet new_data = {}\nlet group_color = {}\nlet color = echartsInstance.getOption().color\nfor (i=0;i<data_length;i++){\n  let key = sample[i] + '&' + tar[i]\n  if (!Boolean(group_color[sample[i]])) {\n    group_color[sample[i]] = color.shift()\n  }\n  if (!Boolean(new_data[key])) {\n    new_data[key] = {\n      data: new Array(xAxis.length),\n      type: 'line',\n      name: key,\n      smooth: true,\n      showSymbol: false,\n      color: group_color[sample[i]]\n  \t}\n  }\n  let index = xAxis.indexOf(tmp[i])\n  new_data[key]['data'][index] = fluor[i]\n}\n\nlet series = []\nfor (let i in new_data){\n  series.push(new_data[i])\n}\n\nreturn {\n  grid: {\n    right: 200,\n  },\n  legend: {\n    show: true,\n    type: 'scroll',\n    orient: 'vertical',\n    right: 0,\n    selector: true\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'cross',\n      label: {\n        backgroundColor: '#6a7985'\n      }\n    },\n    confine: true\n  },\n  xAxis: {\n    type: 'category',\n    data: xAxis\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: series\n};"
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "sample"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "tar"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "tmp"
+              ],
+              "type": "tag"
+            }
+          ],
+          "measurement": "pcr_rdml_mdp",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"fluor\" FROM \"pcr_rdml_mdp\" GROUP BY \"sample\", \"tar\", \"tmp\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "fluor"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "荧光定量PCR—熔点曲线",
+      "type": "bilibala-echarts-panel"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 25,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2020-06-01T08:30:12.000Z",
+    "to": "2020-06-01T09:09:42.000Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "PCR监控",
+  "uid": "htMmiciMz",
+  "version": 9
+}

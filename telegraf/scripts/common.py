@@ -1,10 +1,11 @@
 import logging
 import argparse
 import redis
+import platform
 from influxdb import InfluxDBClient
 
-STEP = 300
-R_STEP = 500
+POSITION_STEP = 300  # 位点区间长度
+LENGTH_STEP = 500  # reads长度区间长度
 
 
 class BaseCommand:
@@ -34,7 +35,11 @@ class BaseCommand:
         parser = self.parser()
         self.args = parser.parse_args()
         self.logger = self._init_logger()
-        self.handle(self.args)
+        try:
+            self.handle(self.args)
+        except Exception as e:
+            self.logger.error(e)
+            raise e
 
     def handle(self, args):
         """
@@ -50,9 +55,11 @@ class BaseCommand:
         return logger
 
     def parser(self):
-        parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        parser = argparse.ArgumentParser()
         parser.add_argument('-r', '--redis-host', default='redis-server', help='redis server host')
         parser.add_argument('-i', '--influxdb-host', default='influxdb-server', help='influxdb server host')
+        parser.add_argument('-iu', '--influxdb-username', default='', help='influxdb server username')
+        parser.add_argument('-ip', '--influxdb-password', default='', help='influxdb server password')
         parser.add_argument('-l', '--log-file', default='/var/log/tigk.log', help='log file path')
         return parser
 
@@ -61,5 +68,12 @@ class BaseCommand:
         return client
 
     def influxdb_cli(self):
-        client = InfluxDBClient(host=self.args.influxdb_host, port=8086, database='telegraf')
+        client = InfluxDBClient(
+            host=self.args.influxdb_host,
+            port=8086,
+            username=self.args.influxdb_username,
+            password=self.args.influxdb_password,
+            database='telegraf',
+            gzip=True
+        )
         return client

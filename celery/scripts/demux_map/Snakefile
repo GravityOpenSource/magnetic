@@ -1,0 +1,33 @@
+import os
+
+##### Configuration #####
+
+# gloal options
+input_fastq = config["input_fastq"]
+reference_file = config["reference_file"]
+output_path = config["output_path"].rstrip("/")
+fastq_name = os.path.splitext(os.path.basename(input_fastq))[0]
+temp_output_path = os.path.join(output_path, 'temp')
+
+# guppy options
+guppy_barcoding_threads = config["guppy_barcoding_threads"]
+guppy_barcoding_path = os.path.join(temp_output_path, "guppy_barcoding_%s" % fastq_name)
+guppy_barcoding_summary = os.path.join(temp_output_path, "%s_barcoding_summary.txt" % fastq_name)
+
+# minimap2 option
+minimap2_paf = os.path.join(temp_output_path, "%s_minimap2.paf" % fastq_name)
+
+# parse mapping
+minimum_identity = ("--min_identity %s" % config.get("min_identity")) if config.get("min_identity") else ""
+report_csv = os.path.join(output_path, '%s.csv' % fastq_name)
+
+##### Target rules #####
+
+rule all:
+    input:
+         report_csv
+
+##### Modules #####
+include: "rules/guppy_barcoder.smk"
+include: "rules/minimap2.smk"
+include: "rules/parse.smk"
