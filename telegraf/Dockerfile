@@ -4,7 +4,7 @@ LABEL maintainer="zhuy@grandomics.com"
 RUN sed -i "s@http://ftp.debian.org@http://repo.huaweicloud.com@g" /etc/apt/sources.list && \
     sed -i "s@http://security.debian.org@http://repo.huaweicloud.com@g" /etc/apt/sources.list && \
     sed -i "s@http://deb.debian.org@http://repo.huaweicloud.com@g" /etc/apt/sources.list
-
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 RUN apt update
 RUN apt install -y python3 python3-pip
 COPY requirements.txt .
