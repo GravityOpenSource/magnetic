@@ -19,7 +19,7 @@ def demux_map(dataset):
     for data in dataset:
         for value in data.get('values'):
             fields = dict(zip(data.get('columns'), value))
-            filename = os.path.basename(os.path.splitext(fields.get('path'))[0])
+            filename = os.path.basename(fields.get('path'))
             os.chdir('/tmp')
             command = [
                 'snakemake',
