@@ -17,4 +17,8 @@ RUN rm requirements.txt
 RUN mkdir /var/log/celery
 COPY conf.d /etc/supervisor/conf.d/
 
+RUN wget https://americas.oxfordnanoportal.com/software/analysis/ont-guppy-cpu_3.6.1_linux64.tar.gz
+RUN tar -zxvf ont-guppy-cpu_3.6.1_linux64.tar.gz -C /opt/
+ENV PATH /opt/ont-guppy-cpu/bin:$PATH
+
 CMD ["supervisord","-n"]
