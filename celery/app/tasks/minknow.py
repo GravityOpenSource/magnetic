@@ -25,12 +25,12 @@ def demux_map(dataset):
                 'snakemake',
                 '--snakefile /opt/scripts/demux_map/Snakefile',
                 '--configfile /opt/scripts/demux_map/config.yaml',
-                '--cores 8',
+                '--cores 2',
                 '--config',
-                'input_fastq=%s' % data.get('tags').get('dir'),
+                'input_fastq=%s/%s' % (data.get('tags').get('dir'), filename),
                 'output_path=/data/rampart_annotations/%s' % data.get('tags').get('cell'),
-                'filename_stem=%s' % filename,
-                'reference_file=/data/ncov2019/references.fasta'
+                'reference_file=/data/ncov2019/references.fasta',
+                'guppy_barcoding_threads=2'
             ]
             if not os.system(' '.join(command)) == 0:
                 sys.exit(1)
