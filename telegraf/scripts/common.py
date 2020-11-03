@@ -3,6 +3,8 @@ import argparse
 import redis
 import platform
 from influxdb import InfluxDBClient
+from logs import logger
+from db import redis_cli, influxdb_cli
 
 POSITION_STEP = 300  # 位点区间长度
 LENGTH_STEP = 500  # reads长度区间长度
@@ -77,3 +79,33 @@ class BaseCommand:
             gzip=True
         )
         return client
+
+
+class BasicCommand:
+    def run(self):
+        parser = self.parser()
+        self.args = parser.parse_args()
+        self.logger = logger
+        try:
+            self.handle(self.args)
+        except Exception as e:
+            self.logger.error(e)
+            raise e
+
+    def handle(self, args):
+        """
+
+        :param args:
+        :return:
+        """
+        pass
+
+    def parser(self):
+        parser = argparse.ArgumentParser()
+        return parser
+
+    def redis_cli(self):
+        return redis_cli
+
+    def influxdb_cli(self):
+        return influxdb_cli

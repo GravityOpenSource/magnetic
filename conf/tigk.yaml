@@ -1,0 +1,20 @@
+logs:
+  file_path: /var/log/tigk.log
+influxdb:
+  host: influxdb-server
+  port: 8086
+  username: ''
+  password: ''
+  database: telegraf
+redis:
+  host: redis-server
+  port: 6379
+  database: 1
+ont:
+  depth_position_step: 300
+  depth_read_length_step: 500
+  read_length_step: 200
+  fastq_watch_path: /data/basecalled
+immunochromatography:
+  pid_file: /tmp/immunochromatography_watch.pid
+  watch_path: /data/immunochromatography

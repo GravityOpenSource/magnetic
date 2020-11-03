@@ -1,20 +1,23 @@
-# !/usr/bin/env python3
-
 import sys
 
 sys.path.append('/opt/grpc')
 sys.path.append('/opt/scripts')
 
-import os
 import json
-from common import BaseCommand
+from common import BasicCommand
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from daemons.prefab import run
+from conf import conf
+from db import influxdb_cli
+from logs import logger
+
+immunochromatography_conf = conf.get('immunochromatography')
+watch_path = immunochromatography_conf.get('watch_path')
 
 
 class EventHandler(FileSystemEventHandler):
     def on_moved(self, event):
+        logger.info(event)
         if event.is_directory:
             return
         elif event.dest_path.endswith('.json'):
@@ -25,7 +28,6 @@ class EventHandler(FileSystemEventHandler):
             content = f.read()
             raw_data = json.loads(content)
         res = []
-        cli = command.influxdb_cli()
         for sample in raw_data.get('samples'):
             for tvalue in sample.get('tValues'):
                 data = {
@@ -50,40 +52,16 @@ class EventHandler(FileSystemEventHandler):
                     }
                 }
                 res.append(data)
-        cli.write_points(res)
+        influxdb_cli.write_points(res)
 
 
-class Watch(run.RunDaemon):
-    def run(self):
+class WatchCommand(BasicCommand):
+    def handle(self, args):
         event_handler = EventHandler()
         observer = Observer()
-        observer.schedule(event_handler, command.args.path, recursive=True)
+        observer.schedule(event_handler, watch_path, recursive=True)
         observer.setDaemon(False)
         observer.start()
-
-
-class WatchCommand(BaseCommand):
-    def parser(self):
-        parser = super(WatchCommand, self).parser()
-        parser.add_argument('action', choices=['start', 'stop', 'restart'])
-        parser.add_argument('-p', '--path', default='immunochromatography', help='observer path')
-        parser.add_argument('-P', '--pid-file', default='/tmp/immunochromatography_watch.pid', help='pid file')
-        return parser
-
-    def handle(self, args):
-        args.log_file = os.path.abspath(args.log_file)
-        args.pid_file = os.path.abspath(args.pid_file)
-        args.path = os.path.abspath(args.path)
-        watch = Watch(pidfile=args.pid_file)
-        watch.args = args
-        action = args.action
-        watch.run()
-        if action == 'start':
-            watch.start()
-        elif action == 'stop':
-            watch.stop()
-        elif action == 'restart':
-            watch.restart()
 
 
 if __name__ == '__main__':
