@@ -23,7 +23,7 @@ class FastqEventHandler(FileSystemEventHandler):
 
     def get_cell_name(self, path):
         root = watch_path.rstrip('/') + '/'
-        cell_name = path[len(root) + 1:].split('/')[0]
+        cell_name = path[len(root):].split('/')[0]
         return cell_name
 
     def insert(self, path):

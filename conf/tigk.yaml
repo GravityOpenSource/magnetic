@@ -18,3 +18,7 @@ ont:
 immunochromatography:
   pid_file: /tmp/immunochromatography_watch.pid
   watch_path: /data/immunochromatography
+celery:
+  csv_reference_file: /data/ncov2019/references.fasta
+  csv_output_path: /data/rampart_annotations
+  csv_guppy_barcoding_threads: 2

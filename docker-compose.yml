@@ -71,6 +71,7 @@ services:
       - ./celery/data:/opt/celery/data
       - ./celery/scripts:/opt/scripts:ro
       - ../data:/data
+      - ./conf:/etc/tigk_conf:ro
     ports:
       - 9302:80
       - 9303:8080
