@@ -1,3 +1,5 @@
+dbrp "telegraf"."autogen"
+
 var data = stream
     |from()
         .measurement('fastq_watch')
