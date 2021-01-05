@@ -1,0 +1,40 @@
+samples:
+  - name: Example-Sample-01
+    ont:
+      cell: 20200313-COV0028-P5-PAE38849-NCP
+      barcode: NB01
+    pcr:
+      sn: TEST
+      run_well:
+        main: D1
+        positive_control: H8
+        negative_control: H6
+    immunochromatography:
+      sample_id: S-11
+      report_time: 1589764234
+  - name: Sample-02
+    ont:
+      cell: 20200313-COV0028-P5-PAE38849-NCP-1
+      barcode: NB01
+    pcr:
+      sn: TEST
+      run_well:
+        main: D2
+        positive_control: H8
+        negative_control: H6
+    immunochromatography:
+      sample_id: S-1
+      report_time: 1589764234
+  - name: Sample-03
+    ont:
+      cell: 20200313-COV0028-P5-PAE38849-NCP-1
+      barcode: NB03
+    pcr:
+      sn: TEST
+      run_well:
+        main: D3
+        positive_control:
+        negative_control:
+    immunochromatography:
+      sample_id: S-2
+      report_time: 1589764234

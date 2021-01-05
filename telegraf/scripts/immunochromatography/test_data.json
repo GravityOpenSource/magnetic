@@ -1,0 +1,54 @@
+{
+    "deviceName": "荧光免疫层析仪",
+    "deviceType": 1,
+    "deviceID": "xxxxxx",
+    "reportTime": 1589764234,
+    "samples": [
+        {
+            "paitentName": "张三",
+            "paitentID": "xxx",
+            "sampleName": "xxxx",
+            "sampleID": "xxxx",
+            "cValue": 100,
+            "tValues": [
+                {
+                    "tID": "1",
+                    "taxID": "xxx",
+                    "tName": "xxx",
+                    "tValue": 100,
+                    "tResult": "阴性"
+                },
+                {
+                    "tID": "2",
+                    "taxID": "xxx",
+                    "tName": "xxx",
+                    "tValue": 100,
+                    "tResult": "阴性"
+                }
+            ]
+        },
+        {
+            "paitentName": "李四",
+            "paitentID": "xxx",
+            "sampleName": "xxxx",
+            "sampleID": "xxxx",
+            "cValue": 100,
+            "tValues": [
+                {
+                    "tID": "1",
+                    "taxID": "xxx",
+                    "tName": "xxx",
+                    "tValue": 100,
+                    "tResult": "阴性"
+                },
+                {
+                    "tID": "2",
+                    "taxID": "xxx",
+                    "tName": "xxx",
+                    "tValue": 100,
+                    "tResult": "阳性"
+                }
+            ]
+        }
+    ]
+}
