@@ -1,0 +1,36 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "community",
+  "signedByOrg": "bilibala",
+  "signedByOrgName": "bilibala",
+  "plugin": "bilibala-echarts-panel",
+  "version": "2.2.4",
+  "time": 1606644556472,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "module.js": "004eea6c987af35153535c60200d35618dccefb5544e8dfb793896af8a669738",
+    "img/logo.png": "625efe450ed7e08077f1fba44fb46d125cd1d0e73c3e247bf47d3a77c4cbc34a",
+    "img/screenshot.png": "f76720938613b11db86f62c4f6ee2a49eeccb2af2c1e3cfc970286a91a9af763",
+    "plugin.json": "93e046b75008462007c48fd9f6ffde49c6c58700e9526a402d1488b5dfb11fe3",
+    "README.md": "a2a82651d484da0bbe3e8104e0b021af8fb8273af8504ba9f8c97af3ab38efc4",
+    "LICENSE": "16e873d634199dc3ab8033a7c76e2c095e339821f3aec73bf95ee4dbbf26fff3",
+    "map/china.json": "c9b6df42c892516fcccce34ed536b4cb58ac4d52edcdaeb1bf780314ebdbe9ce",
+    "module.js.map": "6b2dcc5740bf88b86cf4726d6a597d8ab8a8976be19fa38e0ba76b050a052b5b",
+    "CHANGELOG.md": "f039df40cb9e6dffcd8eb814227ba03e47f686d447bfb45e5eae8bdf83fa9465",
+    "module.js.LICENSE.txt": "e76052b4845a62e9eb6179836628d1965dc8f830bb87b83f6cecdc06e0ec5b91"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.1
+Comment: https://openpgpjs.org
+
+wqEEARMKAAYFAl/Dc0wACgkQfk0ManCIZufqqgIJAS9lGgRhtLh6CJZ5IiDs
+VmiTHCFO3qAp9ji8YvHI3utA6uN79NQnIQBdBLIiDtOzeKuWWSE3SSwgs2xW
+2j/3JfTPAgdMawRH1Xtw2F43CN2XSzlRQUFcWkyvOxE0iuPT6DrHEB7Z0nW5
+3tpER1zbfFHQUWvZnH2yfbcmFth5liaddOGXHQ==
+=8aQB
+-----END PGP SIGNATURE-----

@@ -1,0 +1,749 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 18,
+  "iteration": 1608795849247,
+  "links": [],
+  "panels": [
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "followTheme": false,
+        "getOption": "let x = []\nlet value = []\ndata.series.every((s) => {\n  x = s.fields.find((f) => f.name === 'position').values.buffer\n  value = s.fields.find((f) => f.name === 'max').values.buffer\n})\n\noption = {\n    color: ['#3398DB'],\n    tooltip: {\n        trigger: 'axis',\n        axisPointer: {            // 坐标轴指示器，坐标轴触发有效\n            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'\n        }\n    },\n    grid: {\n        left: '3%',\n        right: '4%',\n        bottom: '3%',\n        containLabel: true\n    },\n    xAxis: [\n        {\n            type: 'category',\n            data: x,\n            axisTick: {\n                alignWithLabel: true\n            }\n        }\n    ],\n    yAxis: [\n        {\n            type: 'value'\n        }\n    ],\n    series: [\n        {\n            name: '',\n            type: 'bar',\n            barWidth: '60%',\n            data: value\n        }\n    ],\n    animation: false\n}\nreturn option"
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "position"
+              ],
+              "type": "tag"
+            }
+          ],
+          "measurement": "reads_depth_stats",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "cell",
+              "operator": "=~",
+              "value": "/^$ont_cell$/"
+            },
+            {
+              "condition": "AND",
+              "key": "barcode",
+              "operator": "=~",
+              "value": "/^$ont_barcode$/"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "样本：$sample_name ONT测序深度",
+      "type": "bilibala-echarts-panel"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "followTheme": false,
+        "getOption": "let readLen = []\nlet value = []\nlet merge = []\ndata.series.every((s) => {\n  readLen = s.fields.find((f) => f.name === 'read_len').values.buffer\n  value = s.fields.find((f) => f.name === 'max').values.buffer\n  merge = readLen.map((r, i) => {\n    return {r:r, v:value[i]}\n\t})\n  readLen = []\n  value = []\n  merge.sort((a, b) => {\n    let astart = a.r.split('-')[0]\n  \tlet bstart = b.r.split('-')[0]\n  \treturn astart - bstart\n\t})\n  merge.forEach(item => {\n    readLen.push(item.r)\n    value.push(item.v)\n  })\n})\noption = {\n    color: ['#3398DB'],\n    tooltip: {\n        trigger: 'axis',\n        axisPointer: {            // 坐标轴指示器，坐标轴触发有效\n            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'\n        }\n    },\n    grid: {\n        left: '3%',\n        right: '4%',\n        bottom: '3%',\n        containLabel: true\n    },\n    xAxis: [\n        {\n            type: 'category',\n            data: readLen,\n            axisTick: {\n                alignWithLabel: true\n            }\n        }\n    ],\n    yAxis: [\n        {\n            type: 'value'\n        }\n    ],\n    series: [\n        {\n            name: '',\n            type: 'bar',\n            barWidth: '60%',\n            data: value\n        }\n    ],\n    animation: false\n}\nreturn option"
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "read_len"
+              ],
+              "type": "tag"
+            }
+          ],
+          "measurement": "reads_length_stats",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "cell",
+              "operator": "=~",
+              "value": "/^$ont_cell$/"
+            },
+            {
+              "condition": "AND",
+              "key": "barcode",
+              "operator": "=~",
+              "value": "/^$ont_barcode$/"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "样本：$sample_name ONT测序读长",
+      "type": "bilibala-echarts-panel"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 6,
+      "options": {
+        "followTheme": false,
+        "getOption": "if (data.series.length === 0) {\n  return\n}\nlet cyc, sample, tar, fluor\ndata.series[0].fields.forEach(val=>{\n  if (val.name === 'cyc') cyc = val.values.buffer;\n  if (val.name === 'sample') sample = val.values.buffer;\n  if (val.name === 'tar') tar = val.values.buffer;\n  if (val.name === 'fluor') fluor = val.values.buffer;\n})\nlet max = Math.max(...cyc)\nif(data.series[1]){\n  data.series[1].fields.forEach(val=>{\n  if (val.name === 'cyc') cyc.push.apply(cyc,val.values.buffer);\n  if (val.name === 'sample') sample.push.apply(sample,val.values.buffer)\n  if (val.name === 'tar'){\n    for(let ti = 0; ti< val.values.length; ti++){\n      tar.push('阴性对照:' + val.values.buffer[ti])\n    }\n  } \n  if (val.name === 'fluor') fluor.push.apply(fluor,val.values.buffer);\n})\n}\nif (data.series[2]){\n  data.series[2].fields.forEach(val=>{\n  if (val.name === 'cyc') cyc.push.apply(cyc,val.values.buffer);\n  if (val.name === 'sample') sample.push.apply(sample,val.values.buffer)\n  if (val.name === 'tar'){\n    for(let ti = 0; ti< val.values.length; ti++){\n      tar.push('阳性对照:' + val.values.buffer[ti])\n    }\n  } \n  if (val.name === 'fluor') fluor.push.apply(fluor,val.values.buffer);\n})\n}\n\nlet xAxis = Array.from({length: max}, (v, i) => i + 1)\nlet data_length = cyc.length\nlet new_data = {}\nlet group_color = {}\nlet color = echartsInstance.getOption().color\nfor (i=0;i<data_length;i++){\n  let key = sample[i] + '&' + tar[i]\n  if (!Boolean(group_color[sample[i]])) {\n    group_color[sample[i]] = color.shift()\n  }\n  if (!Boolean(new_data[key])) {\n    new_data[key] = {\n      data: new Array(xAxis.length),\n      type: 'line',\n      name: key,\n      smooth: true,\n      showSymbol: false,\n      color: group_color[sample[i]]\n  \t}\n  }\n  new_data[key]['data'][cyc[i] - 1] = fluor[i]\n}\nlet series = []\nfor (let i in new_data){\n  series.push(new_data[i])\n}\nreturn {\n  grid: {\n    right: 200,\n  },\n  legend: {\n    show: true,\n    type: 'scroll',\n    orient: 'vertical',\n    right: 0,\n    selector: true\n  },\n  tooltip: {\n    trigger: 'item',\n    axisPointer: {\n      type: 'cross',\n      label: {\n        backgroundColor: '#6a7985'\n      }\n    },\n    confine: true\n  },\n  xAxis: {\n    type: 'category',\n    data: xAxis\n  },\n  yAxis: {\n    type: 'value'\n  },\n  series: series,\n  animation: false\n};"
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"fluor\" FROM \"pcr_rdml_adp\" WHERE sample = '$pcr_run_well' GROUP BY \"sample\", \"tar\", \"cyc\" ",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "cpu",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"fluor\" FROM \"pcr_rdml_adp\" WHERE sample = '$pcr_negative_control' GROUP BY \"sample\", \"tar\", \"cyc\" ",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "usage_idle"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"fluor\" FROM \"pcr_rdml_adp\" WHERE sample = '$pcr_positive_control' GROUP BY \"sample\", \"tar\", \"cyc\" ",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "样本：$sample_name PCR定量曲线",
+      "type": "bilibala-echarts-panel"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "hiddenSeries": false,
+      "id": 8,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "$tag_channel_display",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"value\" FROM \"pcr_data\" GROUP BY \"channel_display\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": " 恒温荧光扩增PCR—算法计算后的曲线",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 10,
+      "options": {
+        "followTheme": false,
+        "getOption": "let x = []\nlet value = []\ndata.series.every((s) => {\n  x = s.fields.find((f) => f.name === 'tID').values.buffer\n  value = s.fields.find((f) => f.name === 'tValue').values.buffer\n})\n\noption = {\n    color: ['#3398DB'],\n    tooltip: {\n        trigger: 'axis',\n        axisPointer: {            // 坐标轴指示器，坐标轴触发有效\n            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'\n        }\n    },\n    grid: {\n        left: '3%',\n        right: '4%',\n        bottom: '3%',\n        containLabel: true\n    },\n    xAxis: [\n        {\n            type: 'category',\n            data: x,\n            axisTick: {\n                alignWithLabel: true\n            }\n        }\n    ],\n    yAxis: [\n        {\n            type: 'value'\n        }\n    ],\n    series: [\n        {\n            name: '',\n            type: 'bar',\n            barWidth: '60%',\n            data: value\n        }\n    ],\n    animation: false\n}\nreturn option"
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "immunochromatography",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"tValue\" FROM \"immunochromatography\" WHERE (\"sampleID\" = '$immunochromatography_sample_id' AND \"reportTime\" = '$immunochromatography_report_time') GROUP BY \"tID\", \"tResult\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "tValue"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "免疫层析结果",
+      "type": "bilibala-echarts-panel"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 25,
+  "style": "dark",
+  "tags": [
+    "实验结果"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "样本名称查询",
+        "name": "sample_query",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "Example-Sample-01",
+          "value": "Example-Sample-01"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info with key = \"sample_name\" where sample_name =~ /$sample_query/",
+        "hide": 0,
+        "includeAll": false,
+        "label": "样本名称",
+        "multi": false,
+        "name": "sample_name",
+        "options": [],
+        "query": "show tag values from sample_info with key = \"sample_name\" where sample_name =~ /$sample_query/",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "NB01",
+          "value": "NB01"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_ont with key = \"barcode\" where sample_name = '$sample_name'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "ONT-Barcode",
+        "multi": false,
+        "name": "ont_barcode",
+        "options": [],
+        "query": "show tag values from sample_info_ont with key = \"barcode\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "20200313-COV0028-P5-PAE38849-NCP",
+          "value": "20200313-COV0028-P5-PAE38849-NCP"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_ont with key = \"cell\" where sample_name = '$sample_name'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "ONT-Cell",
+        "multi": false,
+        "name": "ont_cell",
+        "options": [],
+        "query": "show tag values from sample_info_ont with key = \"cell\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "D1",
+          "value": "D1"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_pcr with key = \"run_well\" where sample_name = '$sample_name'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "PCR-孔位",
+        "multi": false,
+        "name": "pcr_run_well",
+        "options": [],
+        "query": "show tag values from sample_info_pcr with key = \"run_well\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "S-11",
+          "value": "S-11"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_immunochromatography with key = \"sample_id\" where sample_name = '$sample_name'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "免疫层析样本ID",
+        "multi": false,
+        "name": "immunochromatography_sample_id",
+        "options": [],
+        "query": "show tag values from sample_info_immunochromatography with key = \"sample_id\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "1589764234",
+          "value": "1589764234"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_immunochromatography with key = \"report_time\" where sample_name = '$sample_name'",
+        "hide": 0,
+        "includeAll": false,
+        "label": "免疫层析实验编号",
+        "multi": false,
+        "name": "immunochromatography_report_time",
+        "options": [],
+        "query": "show tag values from sample_info_immunochromatography with key = \"report_time\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "H8",
+          "value": "H8"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_pcr with key = \"positive_control\" where sample_name = '$sample_name'",
+        "hide": 2,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "pcr_positive_control",
+        "options": [],
+        "query": "show tag values from sample_info_pcr with key = \"positive_control\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "H6",
+          "value": "H6"
+        },
+        "datasource": "telegraf",
+        "definition": "show tag values from sample_info_pcr with key = \"negative_control\" where sample_name = '$sample_name'",
+        "hide": 2,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "pcr_negative_control",
+        "options": [],
+        "query": "show tag values from sample_info_pcr with key = \"negative_control\" where sample_name = '$sample_name'",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "样本实验结果",
+  "uid": "UiiJf42Gk",
+  "version": 47
+}
