@@ -2,7 +2,7 @@ redis==3.5.3
 influxdb==5.3.0
 pywin32;platform_system=="Windows"
 watchdog==0.10.6
-protobuf==3.13.0
+protobuf==3.18.3
 grpcio==1.33.2
 grpcio-tools==1.33.2
 xmltodict==0.12.0
